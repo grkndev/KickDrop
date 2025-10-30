@@ -3,6 +3,12 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
+import dayjs from "dayjs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Card,
   CardAction,
@@ -19,14 +25,31 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Minus, Plus } from "lucide-react";
+import { mapRange, MessageFilterType } from "@/lib/utils";
+import { Gem, Minus, Plus } from "lucide-react";
 import React from "react";
 
+const tags = Array.from({ length: 50 })
+  .map((_, i, a) => `grkndev ${a.length - i}`)
+  .reverse();
+
 export default function Home() {
-  const [subsPeriod, setSubsPeriod] = React.useState(8);
+  const [subsPeriod, setSubsPeriod] = React.useState(1);
+  const [subsLuck, setSubsLuck] = React.useState(1);
+  const [message, setMessage] = React.useState("");
+  const [messageFilter, setMessageFilter] = React.useState<MessageFilterType>(
+    MessageFilterType.Contains
+  );
+
+  const handleSubsLuckChange = React.useCallback((e: number[]) => {
+    const value = e[0];
+    let rangedValue = mapRange(value, 0, 100, 1, 4).toFixed(1);
+    setSubsLuck(Number(rangedValue));
+  }, []);
 
   const handleSubsAdjustment = React.useCallback((adjustment: number) => {
     setSubsPeriod((prevCount) =>
@@ -58,7 +81,10 @@ export default function Home() {
                 {/* MESSAGE_INPUT */}
                 <div className="flex gap-2">
                   <div className="flex flex-col gap-1">
-                    <Input placeholder="message..." />
+                    <Input
+                      placeholder="message..."
+                      onChange={(e) => setMessage(e.target.value)}
+                    />
                     <Label className="text-xs text-zinc-500">
                       The message users must write to participate. If you leave
                       it blank, anyone who writes any message will participate.
@@ -70,21 +96,40 @@ export default function Home() {
                 {/* MESSAGE SETTING */}
                 <div className="flex flex-col gap-2">
                   <h2>Message settings</h2>
-                  <RadioGroup defaultValue="contains" className="flex ">
+                  <RadioGroup
+                    defaultValue="equals"
+                    className="flex"
+                    onValueChange={(e) =>
+                      setMessageFilter(e as MessageFilterType)
+                    }
+                    value={messageFilter}
+                  >
                     <div className="flex items-center gap-3">
-                      <RadioGroupItem value="equals" id="r1" />
+                      <RadioGroupItem
+                        value={MessageFilterType.Equals}
+                        id="r1"
+                      />
                       <Label htmlFor="r1">Equals</Label>
                     </div>
                     <div className="flex items-center gap-3">
-                      <RadioGroupItem value="contains" id="r2" />
+                      <RadioGroupItem
+                        value={MessageFilterType.Contains}
+                        id="r2"
+                      />
                       <Label htmlFor="r2">Contains</Label>
                     </div>
                     <div className="flex items-center gap-3">
-                      <RadioGroupItem value="startswith" id="r3" />
+                      <RadioGroupItem
+                        value={MessageFilterType.StartsWith}
+                        id="r3"
+                      />
                       <Label htmlFor="r3">Starts with</Label>
                     </div>
                     <div className="flex items-center gap-3">
-                      <RadioGroupItem value="endswith" id="r4" />
+                      <RadioGroupItem
+                        value={MessageFilterType.EndsWith}
+                        id="r4"
+                      />
                       <Label htmlFor="r4">Ends with</Label>
                     </div>
                   </RadioGroup>
@@ -147,7 +192,7 @@ export default function Home() {
                         <FieldDescription>month(s) and above</FieldDescription>
                       </FieldContent>
                       <ButtonGroup>
-                      <Button
+                        <Button
                           variant="outline"
                           size="icon-sm"
                           type="button"
@@ -165,7 +210,7 @@ export default function Home() {
                           className="h-8 !w-14 text-center"
                           maxLength={3}
                         />
-                       
+
                         <Button
                           variant="outline"
                           size="icon-sm"
@@ -183,8 +228,14 @@ export default function Home() {
                   <div className="flex flex-col gap-0">
                     <h3 className="text-lg font-medium">Subs luck</h3>
                     <div className="flex items-center gap-4">
-                      <Slider />
-                      <Label className="text-lg">1,5x</Label>
+                      <Slider
+                        value={[mapRange(subsLuck, 1, 4, 1, 100)]}
+                        onValueChange={handleSubsLuckChange}
+                        min={1}
+                        max={100}
+                        defaultValue={[1]}
+                      />
+                      <Label className="text-lg">{subsLuck}x</Label>
                     </div>
                   </div>
                 </div>
@@ -212,6 +263,34 @@ export default function Home() {
             <CardTitle className="text-2xl font-bold">Chat</CardTitle>
           </CardHeader>
           <Separator className="bg-kick" />
+          <CardContent className="relative overflow-hidden" id="chatcontent">
+            <ScrollArea
+              className={`h-full w-full flex-1 [&>[data-radix-scroll-area-viewport]]:max-h-[calc(95vh-200px)]`}
+            >
+              {tags.map((tag) => (
+                <React.Fragment key={tag}>
+                  <div className="flex flex-row gap-2 items-center">
+                    <span className="text-xs text-zinc-500">
+                      {dayjs(Date.now()).format("HH:mm:ss")}
+                    </span>
+                    <Tooltip >
+                      <TooltipTrigger asChild>
+                        <div className="bg-pink-500 p-1 rounded-sm">
+                          <Gem size={14} />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>VIP</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <span className="font-semibold">{tag}:</span>
+                    <span>Hello</span>
+                  </div>
+                  <Separator className="my-2" />
+                </React.Fragment>
+              ))}
+            </ScrollArea>
+          </CardContent>
         </Card>
 
         <Card className="w-full h-full">
@@ -220,6 +299,33 @@ export default function Home() {
             <h2 className="text-2xl font-bold text-kick">0</h2>
           </CardHeader>
           <Separator className="bg-kick" />
+          <CardContent className="relative overflow-hidden" id="chatcontent">
+            <ScrollArea
+              className={`h-full w-full flex-1 [&>[data-radix-scroll-area-viewport]]:max-h-[calc(95vh-200px)]`}
+            >
+              {tags.map((tag) => (
+                <React.Fragment key={tag}>
+                  <div className="flex flex-row gap-2 items-center">
+                    <span className="text-xs text-zinc-500">
+                      {dayjs(Date.now()).format("HH:mm:ss")}
+                    </span>
+                    <Tooltip >
+                      <TooltipTrigger asChild>
+                        <div className="bg-pink-500 p-1 rounded-sm">
+                          <Gem size={14} />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>VIP</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <span className="font-semibold">{tag}</span>
+                  </div>
+                  <Separator className="my-2" />
+                </React.Fragment>
+              ))}
+            </ScrollArea>
+          </CardContent>
         </Card>
 
         <Card className="w-full h-full">
@@ -228,6 +334,30 @@ export default function Home() {
             <h2 className="text-2xl font-bold text-kick">0</h2>
           </CardHeader>
           <Separator className="bg-kick" />
+          <CardContent className="relative overflow-hidden" id="chatcontent">
+            <ScrollArea
+              className={`h-full w-full flex-1 [&>[data-radix-scroll-area-viewport]]:max-h-[calc(95vh-200px)]`}
+            >
+              {tags.map((tag) => (
+                <React.Fragment key={tag}>
+                  <div className="flex flex-row gap-2 items-center">
+                    <Tooltip >
+                      <TooltipTrigger asChild>
+                        <div className="bg-pink-500 p-1 rounded-sm">
+                          <Gem size={14} />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>VIP</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <span className="font-semibold">{tag}</span>
+                  </div>
+                  <Separator className="my-2" />
+                </React.Fragment>
+              ))}
+            </ScrollArea>
+          </CardContent>
         </Card>
       </div>
       <Footer />
