@@ -29,10 +29,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { mapRange, MessageFilterType } from "@/lib/utils";
+import { mapRange, MessageFilterType, parseData } from "@/lib/utils";
 import { Gem, Minus, Plus } from "lucide-react";
 import React from "react";
-
+import ChatBox from "@/components/ChatBox";
+import Pusher from "pusher-js";
+import { ChatMessage } from "@/lib/ChatMessage.type";
 const tags = Array.from({ length: 50 })
   .map((_, i, a) => `grkndev ${a.length - i}`)
   .reverse();
@@ -41,9 +43,42 @@ export default function Home() {
   const [subsPeriod, setSubsPeriod] = React.useState(1);
   const [subsLuck, setSubsLuck] = React.useState(1);
   const [message, setMessage] = React.useState("");
+  const [chatData, setChatData] = React.useState<ChatMessage[]>();
   const [messageFilter, setMessageFilter] = React.useState<MessageFilterType>(
     MessageFilterType.Contains
   );
+  const updateChat = React.useEffectEvent((data: any) => {
+   
+      const parsed: ChatMessage = parseData(data);
+      setChatData((prev) => [...(prev ?? []), parsed]);
+   
+  });
+
+  React.useEffect(() => {
+    const pusher = new Pusher("32cbd69e4b950bf97679", {
+      cluster: "us2",
+      forceTLS: true,
+      enabledTransports: ["ws", "wss"],
+    });
+
+    pusher.connection.bind("connected", () => {
+      console.log("✅ Pusher connection established.");
+    });
+
+    pusher.connection.bind("error", (err: any) => {
+      console.error("❌ Pusher connection error:", err);
+    });
+    const channel = pusher.subscribe("chatrooms.1000890.v2");
+
+    channel.bind("App\\Events\\ChatMessageEvent", (data: any) => {
+      updateChat(data);
+    });
+
+    return () => {
+      pusher.unsubscribe("chatrooms.1000890.v2");
+      pusher.disconnect();
+    };
+  }, []);
 
   const handleSubsLuckChange = React.useCallback((e: number[]) => {
     const value = e[0];
@@ -264,32 +299,7 @@ export default function Home() {
           </CardHeader>
           <Separator className="bg-kick" />
           <CardContent className="relative overflow-hidden" id="chatcontent">
-            <ScrollArea
-              className={`h-full w-full flex-1 [&>[data-radix-scroll-area-viewport]]:max-h-[calc(95vh-200px)]`}
-            >
-              {tags.map((tag) => (
-                <React.Fragment key={tag}>
-                  <div className="flex flex-row gap-2 items-center">
-                    <span className="text-xs text-zinc-500">
-                      {dayjs(Date.now()).format("HH:mm:ss")}
-                    </span>
-                    <Tooltip >
-                      <TooltipTrigger asChild>
-                        <div className="bg-pink-500 p-1 rounded-sm">
-                          <Gem size={14} />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>VIP</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <span className="font-semibold">{tag}:</span>
-                    <span>Hello</span>
-                  </div>
-                  <Separator className="my-2" />
-                </React.Fragment>
-              ))}
-            </ScrollArea>
+            <ChatBox messages={chatData ?? []} />
           </CardContent>
         </Card>
 
@@ -307,9 +317,9 @@ export default function Home() {
                 <React.Fragment key={tag}>
                   <div className="flex flex-row gap-2 items-center">
                     <span className="text-xs text-zinc-500">
-                      {dayjs(Date.now()).format("HH:mm:ss")}
+                      {/* {dayjs(Date.now()).format("HH:mm:ss")} */}
                     </span>
-                    <Tooltip >
+                    <Tooltip>
                       <TooltipTrigger asChild>
                         <div className="bg-pink-500 p-1 rounded-sm">
                           <Gem size={14} />
@@ -338,10 +348,10 @@ export default function Home() {
             <ScrollArea
               className={`h-full w-full flex-1 [&>[data-radix-scroll-area-viewport]]:max-h-[calc(95vh-200px)]`}
             >
-              {tags.map((tag) => (
+              {/* {tags.map((tag) => (
                 <React.Fragment key={tag}>
                   <div className="flex flex-row gap-2 items-center">
-                    <Tooltip >
+                    <Tooltip>
                       <TooltipTrigger asChild>
                         <div className="bg-pink-500 p-1 rounded-sm">
                           <Gem size={14} />
@@ -355,7 +365,7 @@ export default function Home() {
                   </div>
                   <Separator className="my-2" />
                 </React.Fragment>
-              ))}
+              ))} */}
             </ScrollArea>
           </CardContent>
         </Card>

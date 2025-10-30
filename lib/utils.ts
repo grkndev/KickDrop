@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { ChatMessage } from "./ChatMessage.type";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -34,4 +35,17 @@ export enum MessageFilterType {
   Contains = "contains",
   StartsWith = "startswith",
   EndsWith = "endswith",
+}
+
+export function parseData(data: any): ChatMessage {
+  // Eğer data zaten bir obje ise, içindeki 'data' string'ini parse et
+  if (typeof data === "object" && data.data) {
+    return JSON.parse(data.data);
+  }
+  // Eğer data bir string ise direkt parse et
+  if (typeof data === "string") {
+    return JSON.parse(data);
+  }
+  // Zaten parse edilmişse olduğu gibi dön
+  return data;
 }
