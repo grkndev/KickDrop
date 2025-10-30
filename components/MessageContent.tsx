@@ -80,7 +80,7 @@ const MessageContent = memo(({ content }: MessageContentProps) => {
             />
           );
         }
-        return <span key={index}>{part.content}</span>;
+        return part.content
       })}
     </>
   );

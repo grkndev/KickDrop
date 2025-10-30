@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className={`${montserrat.className} antialiased dark`}>
         <main className="flex-1 h-screen">
           {children}</main>
-        <Toaster />
+        <Toaster position="top-center"  />
       </body>
     </html>
   );
