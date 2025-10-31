@@ -4,7 +4,12 @@ import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldContent, FieldDescription, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -22,10 +27,21 @@ import { useKickChat } from "@/hooks/useKickChat";
 import { useParticipants } from "@/hooks/useParticipants";
 import { useMessageFilter } from "@/hooks/useMessageFilter";
 import { useFilterSettings } from "@/hooks/useFilterSettings";
-
+import Landing from "@/components/Landing";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 export default function Home() {
-  const [streamName] = React.useState("atadogann");
-  
+  const [streamName, setStreamerName] = React.useState("");
+
   const filterSettings = useFilterSettings();
   const { filterMessage } = useMessageFilter();
   const {
@@ -68,17 +84,28 @@ export default function Home() {
     ]
   );
 
-  const { chatData, chatRoomId } = useKickChat(streamName, handleMessage);
+  const { chatData, chatRoomId } = useKickChat(
+    streamName || null,
+    handleMessage
+  );
 
-  const handleSubsLuckChange = React.useCallback((e: number[]) => {
-    const value = e[0];
-    let rangedValue = mapRange(value, 0, 100, 1, 4).toFixed(1);
-    filterSettings.setSubsLuck(Number(rangedValue));
-  }, [filterSettings]);
+  const handleSubsLuckChange = React.useCallback(
+    (e: number[]) => {
+      const value = e[0];
+      let rangedValue = mapRange(value, 0, 100, 1, 4).toFixed(1);
+      filterSettings.setSubsLuck(Number(rangedValue));
+    },
+    [filterSettings]
+  );
 
-  const handleSubsAdjustment = React.useCallback((adjustment: number) => {
-    filterSettings.setSubsPeriod((prev) => Math.max(1, Math.min(99, prev + adjustment)));
-  }, [filterSettings]);
+  const handleSubsAdjustment = React.useCallback(
+    (adjustment: number) => {
+      filterSettings.setSubsPeriod((prev) =>
+        Math.max(1, Math.min(99, prev + adjustment))
+      );
+    },
+    [filterSettings]
+  );
 
   const handleSubsInputChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +117,11 @@ export default function Home() {
     [filterSettings]
   );
 
+  const handleStreamerName = (streamerName: string) =>
+    setStreamerName(streamerName);
+
   if (!chatRoomId) return <Loading />;
+  if (!streamName) return <Landing handleStreamerName={handleStreamerName} />;
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-4 gap-4">
@@ -111,10 +142,13 @@ export default function Home() {
                     <Input
                       placeholder="message..."
                       value={filterSettings.message}
-                      onChange={(e) => filterSettings.setMessage(e.target.value)}
+                      onChange={(e) =>
+                        filterSettings.setMessage(e.target.value)
+                      }
                     />
                     <Label className="text-xs text-zinc-500">
-                      The message users must write to participate. If you leave it blank, anyone who writes any message will participate.
+                      The message users must write to participate. If you leave
+                      it blank, anyone who writes any message will participate.
                     </Label>
                   </div>
                   <Button className="bg-kick hover:bg-kick/75">Update</Button>
@@ -125,23 +159,37 @@ export default function Home() {
                   <h2>Message settings</h2>
                   <RadioGroup
                     className="flex"
-                    onValueChange={(e) => filterSettings.setMessageFilter(e as MessageFilterType)}
+                    onValueChange={(e) =>
+                      filterSettings.setMessageFilter(e as MessageFilterType)
+                    }
                     value={filterSettings.messageFilter}
                   >
                     <div className="flex items-center gap-3">
-                      <RadioGroupItem value={MessageFilterType.Equals} id="r1" />
+                      <RadioGroupItem
+                        value={MessageFilterType.Equals}
+                        id="r1"
+                      />
                       <Label htmlFor="r1">Equals</Label>
                     </div>
                     <div className="flex items-center gap-3">
-                      <RadioGroupItem value={MessageFilterType.Contains} id="r2" />
+                      <RadioGroupItem
+                        value={MessageFilterType.Contains}
+                        id="r2"
+                      />
                       <Label htmlFor="r2">Contains</Label>
                     </div>
                     <div className="flex items-center gap-3">
-                      <RadioGroupItem value={MessageFilterType.StartsWith} id="r3" />
+                      <RadioGroupItem
+                        value={MessageFilterType.StartsWith}
+                        id="r3"
+                      />
                       <Label htmlFor="r3">Starts with</Label>
                     </div>
                     <div className="flex items-center gap-3">
-                      <RadioGroupItem value={MessageFilterType.EndsWith} id="r4" />
+                      <RadioGroupItem
+                        value={MessageFilterType.EndsWith}
+                        id="r4"
+                      />
                       <Label htmlFor="r4">Ends with</Label>
                     </div>
                   </RadioGroup>
@@ -151,7 +199,9 @@ export default function Home() {
                 {/* Switches */}
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-between">
-                    <Label className="text-lg" htmlFor="subs-only">Subscribers only</Label>
+                    <Label className="text-lg" htmlFor="subs-only">
+                      Subscribers only
+                    </Label>
                     <Switch
                       id="subs-only"
                       className="data-[state=checked]:bg-kick"
@@ -161,7 +211,9 @@ export default function Home() {
                     />
                   </div>
                   <div className="flex justify-between">
-                    <Label className="text-lg" htmlFor="follower-only">Followers only</Label>
+                    <Label className="text-lg" htmlFor="follower-only">
+                      Followers only
+                    </Label>
                     <Switch
                       id="follower-only"
                       className="data-[state=checked]:bg-kick"
@@ -171,7 +223,9 @@ export default function Home() {
                     />
                   </div>
                   <div className="flex justify-between">
-                    <Label className="text-lg" htmlFor="vips-only">VIPs only</Label>
+                    <Label className="text-lg" htmlFor="vips-only">
+                      VIPs only
+                    </Label>
                     <Switch
                       id="vips-only"
                       className="data-[state=checked]:bg-kick"
@@ -181,7 +235,9 @@ export default function Home() {
                     />
                   </div>
                   <div className="flex justify-between">
-                    <Label className="text-lg" htmlFor="mods-only">Mods only</Label>
+                    <Label className="text-lg" htmlFor="mods-only">
+                      Mods only
+                    </Label>
                     <Switch
                       id="mods-only"
                       className="data-[state=checked]:bg-kick"
@@ -198,7 +254,9 @@ export default function Home() {
                   <div className="flex items-center justify-between gap-4">
                     <Field orientation="horizontal">
                       <FieldContent>
-                        <FieldLabel htmlFor="subs-period">Subs period</FieldLabel>
+                        <FieldLabel htmlFor="subs-period">
+                          Subs period
+                        </FieldLabel>
                         <FieldDescription>month(s) and above</FieldDescription>
                       </FieldContent>
                       <ButtonGroup>
@@ -236,13 +294,17 @@ export default function Home() {
                     <h3 className="text-lg font-medium">Subs luck</h3>
                     <div className="flex items-center gap-4">
                       <Slider
-                        value={[mapRange(filterSettings.subsLuck, 1, 4, 1, 100)]}
+                        value={[
+                          mapRange(filterSettings.subsLuck, 1, 4, 1, 100),
+                        ]}
                         onValueChange={handleSubsLuckChange}
                         min={1}
                         max={100}
                         defaultValue={[1]}
                       />
-                      <Label className="text-lg">{filterSettings.subsLuck}x</Label>
+                      <Label className="text-lg">
+                        {filterSettings.subsLuck}x
+                      </Label>
                     </div>
                   </div>
                 </div>
@@ -257,18 +319,94 @@ export default function Home() {
                   Pick Winner
                 </Button>
                 <div className="flex flex-row gap-2">
-                  <Button
-                    className="flex-1 py-6 bg-[#404040] hover:bg-[#404040]/75 text-white font-semibold"
-                    onClick={clearParticipants}
-                  >
-                    Clear Participants
-                  </Button>
-                  <Button
-                    className="flex-1 py-6 bg-[#404040] hover:bg-[#404040]/75 text-white font-semibold"
-                    onClick={clearWinners}
-                  >
-                    Clear Winners
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button className="flex-1 py-6 bg-[#404040] hover:bg-[#404040]/75 text-white font-semibold">
+                        Clear Participants
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. Your participant list
+                          will be completely cleared, and users will need to
+                          re-register.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction asChild>
+                          <Button
+                            className=" bg-[#404040] hover:bg-[#404040]/75 text-white font-semibold"
+                            onClick={clearParticipants}
+                          >
+                            Clear Participants
+                          </Button>
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button className="flex-1 py-6 bg-[#404040] hover:bg-[#404040]/75 text-white font-semibold">
+                        Clear Winners
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. Your winners list will
+                          be completely deleted, and users will need to win
+                          again.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction asChild>
+                          <Button
+                            className=" bg-[#404040] hover:bg-[#404040]/75 text-white font-semibold"
+                            onClick={clearWinners}
+                          >
+                            Clear Winners
+                          </Button>
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+                <div className="flex flex-row gap-2">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline">Disconnect</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to leave the chat?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction asChild>
+                          <Button
+                            className=" border-red-900 border-2 bg-[#390000] hover:bg-[#390000]/75 text-white font-semibold"
+                            onClick={() => setStreamerName("")}
+                          >
+                            Disconnect
+                          </Button>
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </div>
@@ -290,7 +428,9 @@ export default function Home() {
         <Card className="w-full h-full">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-2xl font-bold">Participants</CardTitle>
-            <h2 className="text-2xl font-bold text-kick">{participants.length}</h2>
+            <h2 className="text-2xl font-bold text-kick">
+              {participants.length}
+            </h2>
           </CardHeader>
           <Separator className="bg-kick" />
           <CardContent className="relative overflow-hidden">

@@ -6,7 +6,7 @@ import { ChatMessage } from "@/lib/ChatMessage.type";
 import { parseData } from "@/lib/utils";
 
 export const useKickChat = (
-  streamName: string,
+  streamName: string | null,
   onMessage: (data: ChatMessage) => void
 ) => {
   const [chatRoomId, setChatRoomId] = useState<string | undefined>();
@@ -29,7 +29,7 @@ export const useKickChat = (
   }, [streamName]);
 
   useEffect(() => {
-    if (!chatRoomId) return;
+    if (!chatRoomId || !streamName) return;
 
     console.log("🔌 Connecting to Pusher...");
 
