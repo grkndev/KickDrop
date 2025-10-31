@@ -46,7 +46,7 @@ export default function ChatBox({
           <React.Fragment
             key={`${message.sender.id}-${message.created_at}-${index}`}
           >
-            <div className="leading-relaxed max-w-[47%]">
+            <div className="leading-relaxed max-w-[85%]">
               {message.sender.identity.badges.map((badge) => {
                 return (
                   <Tooltip

@@ -21,7 +21,7 @@ export default function ParticipantsList({ participants }: ParticipantsListProps
                   {getBadge(badge.type)}
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{badge.name}</p>
+                  <p>{badge.text}</p>
                 </TooltipContent>
               </Tooltip>
             ))}

@@ -21,7 +21,7 @@ export default function WinnersList({ winners }: WinnersListProps) {
                   {getBadge(badge.type)}
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{badge.name}</p>
+                  <p>{badge.text}</p>
                 </TooltipContent>
               </Tooltip>
             ))}

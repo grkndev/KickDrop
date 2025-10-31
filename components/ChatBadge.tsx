@@ -10,6 +10,7 @@ import {
   Sword,
   Verified,
 } from "lucide-react";
+import VerifiedIcon from "./ui/VerfiedIcon";
 
 export function getBadge(badge: string) {
   switch (badge) {
@@ -45,8 +46,8 @@ export function getBadge(badge: string) {
       );
     case Badge.Verified:
       return (
-        <div className="bg-[#297d0d] p-1 rounded-sm">
-          <Verified size={14} />
+        <div className="">
+          <VerifiedIcon size={14} />
         </div>
       );
     case Badge.Broadcaster:

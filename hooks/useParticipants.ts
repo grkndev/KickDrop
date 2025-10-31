@@ -41,25 +41,32 @@ export const useParticipants = () => {
     },
     []
   );
-  const getWinner = () => {
-    const randomIndex = Math.floor(Math.random() * participants.length);
-    const winner = participants[randomIndex];
-    if (winners.includes(winner)) getWinner();
-    return winner;
-  };
+
   const pickWinner = useCallback(() => {
     if (participants.length === 0) {
       toast.error("No participants available!");
       return;
     }
 
-    const winner = getWinner();
+    // Daha önce kazanmamış katılımcıları filtrele
+    const availableParticipants = participants.filter(
+      (participant) => !winners.some((winner) => winner.id === participant.id)
+    );
+
+    // Eğer herkes kazandıysa
+    if (availableParticipants.length === 0) {
+      toast.error("Everybody already won!");
+      return;
+    }
+
+    // Rastgele kazanan seç
+    const randomIndex = Math.floor(Math.random() * availableParticipants.length);
+    const winner = availableParticipants[randomIndex];
 
     setWinners((prev) => [...prev, winner]);
-    //setParticipants((prev) => prev.filter((_, index) => index !== randomIndex));
 
     toast.success(`Winner: ${winner.sender.username}`);
-  }, [participants]);
+  }, [participants, winners]);
 
   const clearParticipants = useCallback(() => {
     setParticipants([]);
