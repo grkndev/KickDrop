@@ -49,3 +49,16 @@ export function parseData(data: any): ChatMessage {
   // Zaten parse edilmişse olduğu gibi dön
   return data;
 }
+
+
+
+export enum Badge {
+  Subscriber = "subscriber",
+  Gifter = "sub_gifter",
+  Mod = "moderator",
+  Bot = "bot",
+  Verified = "verified",
+  Broadcaster = "broadcaster",
+  VIP = "vip",
+  OG = "og",
+}

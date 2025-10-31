@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Gem } from "lucide-react";
 import { ChatMessage } from "@/lib/ChatMessage.type";
+import { getBadge } from "./ChatBadge";
 
 interface WinnersListProps {
   winners: ChatMessage[];
@@ -16,13 +17,11 @@ export default function WinnersList({ winners }: WinnersListProps) {
           <div className="flex flex-row gap-2 items-center">
             {winner.sender?.identity?.badges?.map((badge: any, i: number) => (
               <Tooltip key={i}>
-                <TooltipTrigger asChild>
-                  <div className="bg-pink-500 p-1 rounded-sm">
-                    <Gem size={14} />
-                  </div>
+                 <TooltipTrigger asChild>
+                  {getBadge(badge.type)}
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{badge.type}</p>
+                  <p>{badge.name}</p>
                 </TooltipContent>
               </Tooltip>
             ))}

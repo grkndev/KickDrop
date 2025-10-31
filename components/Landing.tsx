@@ -11,6 +11,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import axios from "axios";
 import { toast } from "sonner";
+import Header from "./Header";
 
 export default function Landing({
   handleStreamerName,
@@ -33,7 +34,10 @@ export default function Landing({
       .catch((err) => toast.error(err));
   };
   return (
-    <div className="h-full flex items-center justify-center ">
+    <div className=" w-full h-full flex flex-col gap-4 items-center justify-center ">
+      <h1 className="font-bold text-5xl">
+        Kick<span className="text-kick">Drop</span>
+      </h1>
       <Card className="w-full max-w-xl">
         <CardHeader>
           <CardTitle>Enter streamer name</CardTitle>

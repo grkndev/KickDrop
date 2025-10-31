@@ -426,7 +426,7 @@ export default function Home() {
 
         {/* Participants Card */}
         <Card className="w-full h-full">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row items-center justify-between mb-2">
             <CardTitle className="text-2xl font-bold">Participants</CardTitle>
             <h2 className="text-2xl font-bold text-kick">
               {participants.length}
@@ -440,7 +440,7 @@ export default function Home() {
 
         {/* Winners Card */}
         <Card className="w-full h-full">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row items-center justify-between mb-2">
             <CardTitle className="text-2xl font-bold">Winners</CardTitle>
             <h2 className="text-2xl font-bold text-kick">{winners.length}</h2>
           </CardHeader>

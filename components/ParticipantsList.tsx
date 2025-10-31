@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Gem } from "lucide-react";
 import { ChatMessage } from "@/lib/ChatMessage.type";
+import { getBadge } from "./ChatBadge";
 
 interface ParticipantsListProps {
   participants: ChatMessage[];
@@ -10,19 +11,17 @@ interface ParticipantsListProps {
 
 export default function ParticipantsList({ participants }: ParticipantsListProps) {
   return (
-    <ScrollArea className="h-full w-full flex-1 [&>[data-radix-scroll-area-viewport]]:max-h-[calc(95vh-200px)]">
+    <ScrollArea className="h-full w-full flex-1 [&>[data-radix-scroll-area-viewport]]:max-h-[calc(93vh-200px)]">
       {participants.map((participant, index) => (
         <div key={`${participant.sender.username}-${index}`}>
           <div className="flex flex-row gap-2 items-center">
             {participant.sender?.identity?.badges?.map((badge: any, i: number) => (
               <Tooltip key={i}>
                 <TooltipTrigger asChild>
-                  <div className="bg-pink-500 p-1 rounded-sm">
-                    <Gem size={14} />
-                  </div>
+                  {getBadge(badge.type)}
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{badge.type}</p>
+                  <p>{badge.name}</p>
                 </TooltipContent>
               </Tooltip>
             ))}
