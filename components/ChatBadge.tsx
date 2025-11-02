@@ -47,7 +47,7 @@ export function getBadge(badge: string) {
     case Badge.Verified:
       return (
         <div className="">
-          <VerifiedIcon size={14} />
+          <VerifiedIcon />
         </div>
       );
     case Badge.Broadcaster:
