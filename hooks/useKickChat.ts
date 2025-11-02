@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useEffectEvent } from "react";
 import Pusher from "pusher-js";
 import axios from "axios";
 import { toast } from "sonner";
@@ -28,6 +28,7 @@ export const useKickChat = (
       });
   }, [streamName]);
 
+  const clearChat = () => setChatData([]);
   useEffect(() => {
     if (!chatRoomId || !streamName) return;
 
@@ -64,5 +65,5 @@ export const useKickChat = (
     };
   }, [chatRoomId]); // onMessage dependency'den çıkar
 
-  return { chatData, chatRoomId };
+  return { chatData, chatRoomId, clearChat };
 };

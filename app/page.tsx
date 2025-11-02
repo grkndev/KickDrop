@@ -84,10 +84,17 @@ export default function Home() {
     ]
   );
 
-  const { chatData, chatRoomId } = useKickChat(
+  const { chatData, chatRoomId, clearChat } = useKickChat(
     streamName || null,
     handleMessage
   );
+
+  const handleDisconnect = React.useCallback(() => {
+    setStreamerName("");
+    clearChat();
+    clearParticipants();
+    clearWinners();
+  }, []);
 
   const handleSubsLuckChange = React.useCallback(
     (e: number[]) => {
@@ -399,7 +406,7 @@ export default function Home() {
                         <AlertDialogAction asChild>
                           <Button
                             className=" border-red-900 border-2 bg-[#390000] hover:bg-[#390000]/75 text-white font-semibold"
-                            onClick={() => setStreamerName("")}
+                            onClick={handleDisconnect}
                           >
                             Disconnect
                           </Button>
